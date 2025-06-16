@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from flask import Flask, jsonify, request, make_response
+# server/app.py
+from flask import Flask, jsonify, request
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
 
@@ -16,12 +17,32 @@ db.init_app(app)
 
 api = Api(app)
 
+# GET /plants
 class Plants(Resource):
-    pass
+    def get(self):
+        plants = Plant.query.all()
+        return [plant.to_dict() for plant in plants], 200
 
+    def post(self):
+        data = request.get_json()
+        new_plant = Plant(
+            name=data["name"],
+            image=data["image"],
+            price=data["price"]
+        )
+        db.session.add(new_plant)
+        db.session.commit()
+        return new_plant.to_dict(), 201
+
+# GET /plants/<int:id>
 class PlantByID(Resource):
-    pass
-        
+    def get(self, id):
+        plant = Plant.query.get_or_404(id)
+        return plant.to_dict(), 200
+
+api.add_resource(Plants, '/plants')
+api.add_resource(PlantByID, '/plants/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
