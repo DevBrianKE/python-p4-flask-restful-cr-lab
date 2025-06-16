@@ -11,4 +11,4 @@ class Plant(db.Model, SerializerMixin):
     image = db.Column(db.String)
     price = db.Column(db.Float)
 
-    serialize_rules = ('-id',)  
+    
